@@ -61,7 +61,7 @@ class Tokens extends Component<PropsType, StateType> {
   render() {
     return (
       <div className="Tokens">
-        <h4>Add ERC-20 token</h4>
+        <h4>Add Erc20 token</h4>
         <form action="/" noValidate autoComplete="off" className="form">
           <TextField
             label="Token name"

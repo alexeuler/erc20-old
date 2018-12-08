@@ -22,12 +22,15 @@ type StateType = {
     tokenName: string,
     date: Date,
   }>,
+  route: string,
 };
 
 const offsetDate = (date: Date, offset: number) => {
-  const res = new Date();
-  res.setDate(date.getDate() + offset);
-  return res;
+  return new Date(date.getTime() + 86400000 * offset);
+  // const res = new Date();
+  // res.setDate(date.getDate() + offset);
+  // debugger
+  // return res;
 };
 
 const createDefaultTransactions = () => {
@@ -85,6 +88,7 @@ class App extends Component<PropsType, StateType> {
       { address: '0x0d8775f648430679a709e98d2b0cb6250d2887ef', name: 'BAT', decimals: 18 },
     ],
     transactions: createDefaultTransactions(),
+    route: 'transactions',
   }
 
   update = (newState: StateType) => {
@@ -96,6 +100,7 @@ class App extends Component<PropsType, StateType> {
     this.update({
       tokens: newTokens,
       transactions: this.state.transactions,
+      route: this.state.route,
     });
   }
 
@@ -104,6 +109,7 @@ class App extends Component<PropsType, StateType> {
     this.update({
       tokens: newTokens,
       transactions: this.state.transactions,
+      route: this.state.route,
     });
   }
 
@@ -127,6 +133,7 @@ class App extends Component<PropsType, StateType> {
     this.update({
       tokens: this.state.tokens,
       transactions: newTxs,
+      route: this.state.route,
     });
   }
 
@@ -136,6 +143,7 @@ class App extends Component<PropsType, StateType> {
     this.update({
       tokens: this.state.tokens,
       transactions: newTxs,
+      route: this.state.route,
     });
   }
 
@@ -147,22 +155,26 @@ class App extends Component<PropsType, StateType> {
         <div className="App">
           <AppBar position="static">
             <Toolbar>
-              <Button color="inherit">Transactions</Button>
-              <Button color="inherit">Manage Erc20</Button>
+              <Button className={this.state.route === 'transactions' ? 'underlined' : ''} color="inherit" onClick={() => this.setState({ ...this.state, route: 'transactions' })}>Transactions</Button>
+              <Button className={this.state.route === 'tokens' ? 'underlined' : ''} color="inherit" onClick={() => this.setState({ ...this.state, route: 'tokens' })}>Manage Erc20 Tokens</Button>
             </Toolbar>
           </AppBar>
           <div className="router">
-            <Transactions
-              tokens={this.state.tokens}
-              transactions={this.state.transactions}
-              onTransactionDelete={this.handleTransactionsDelete}
-              onTransactionAdd={this.handleTransactionsAdd}
-            />
-            <Tokens
-              tokens={this.state.tokens}
-              onTokenAdd={this.handleTokenAdd}
-              onTokenDelete={this.handleTokenDelete}
-            />
+            {this.state.route === 'transactions' && (
+              <Transactions
+                tokens={this.state.tokens}
+                transactions={this.state.transactions}
+                onTransactionDelete={this.handleTransactionsDelete}
+                onTransactionAdd={this.handleTransactionsAdd}
+              />
+            )}
+            {this.state.route === 'tokens' && (
+              <Tokens
+                tokens={this.state.tokens}
+                onTokenAdd={this.handleTokenAdd}
+                onTokenDelete={this.handleTokenDelete}
+              />
+            )}
           </div>
 
         </div>

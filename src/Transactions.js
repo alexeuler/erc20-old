@@ -9,6 +9,7 @@ import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
+import Button from '@material-ui/core/Button';
 import Icon from '@material-ui/core/Icon';
 import Input from '@material-ui/core/Input';
 import InputLabel from '@material-ui/core/InputLabel';
@@ -89,7 +90,7 @@ class Transactions extends Component<PropsType, StateType> {
     });
     return (
       <div className="Transactions">
-        <h4>Add ERC-20 transactions</h4>
+        <h4>Schedule Erc20 transactions</h4>
         <form action="/" noValidate autoComplete="off" className="form">
           <div className="container">
             <TextField
@@ -146,7 +147,7 @@ class Transactions extends Component<PropsType, StateType> {
               </Select>
             </FormControl>
             <TextField
-              label="Value"
+              label="Total value"
               className="field"
               name="value"
               value={this.state.value}
@@ -158,8 +159,24 @@ class Transactions extends Component<PropsType, StateType> {
             <AddIcon />
           </Fab>
         </form>
-        <br />
-        <br />
+
+
+        <div className="file">
+          <h5>Or upload a file</h5>
+          <input
+            accept="image/*"
+            style={{ display: 'none' }}
+            id="raised-button-file"
+            multiple
+            type="file"
+          />
+          <label htmlFor="raised-button-file">
+            <Button variant="raised" component="span">
+              Upload a file
+          </Button>
+          </label>
+        </div>
+
         <h4>Transactions</h4>
         <Table aria-labelledby="tableTitle" className="table">
           <TableHead>
