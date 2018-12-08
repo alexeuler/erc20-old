@@ -26,26 +26,37 @@ type PropsType = {
   transactions: Array<{
     address: string,
     value: number,
-    token_name: string,
+    tokenName: string,
     date: Date,
-    status: string,
   }>,
+  onTransactionAdd: (receiver: string,
+    date: Date,
+    count: number,
+    period: number,
+    value: number,
+    tokenName: string,
+  ) => void,
+  onTransactionDelete: (Date, string) => void,
 };
 
 type StateType = {
+  receiver: string,
   date: Date,
   count: number,
   period: number,
   value: number,
-  tokenAddress: ?string,
+  tokenName: ?string,
 };
 
-const createDefaultState = (address: ?string): StateType => ({
+
+
+const createDefaultState = (name: ?string): StateType => ({
+  receiver: '0x0',
   date: new Date(),
   count: 10,
   period: 1,
   value: 10000,
-  tokenAddress: address,
+  tokenName: name,
 });
 
 class Transactions extends Component<PropsType, StateType> {
@@ -53,8 +64,8 @@ class Transactions extends Component<PropsType, StateType> {
   constructor(props: PropsType) {
     super(props);
     const transactions = props.tokens[0];
-    const address = transactions ? transactions.address : null;
-    this.state = createDefaultState(address);
+    const name = transactions ? transactions.name : null;
+    this.state = createDefaultState(name);
   }
 
   handleChange = (name: string, value: any) => {
@@ -63,64 +74,86 @@ class Transactions extends Component<PropsType, StateType> {
   }
 
   handleAdd = () => {
+    this.props.onTransactionAdd(this.state.receiver, this.state.date, this.state.count, this.state.period, this.state.value, this.state.tokenName);
   }
 
   render() {
+    const txs = this.props.transactions.sort((a, b) => {
+      if (a.date < b.date) {
+        return -1;
+      }
+      if (a.date === b.date) {
+        return 0;
+      }
+      return 1;
+    });
     return (
       <div className="Transactions">
         <h4>Add ERC-20 transactions</h4>
         <form action="/" noValidate autoComplete="off" className="form">
-          <TextField
-            label="Start date"
-            className="field"
-            type="date"
-            name="date"
-            value={this.state.date.toISOString().slice(0, 10)}
-            onChange={e => this.handleChange(e.target.name, new Date(e.target.value))}
-            margin="normal"
-          />
-          <TextField
-            label="Number of payments"
-            className="field"
-            name="count"
-            type="number"
-            value={this.state.count}
-            onChange={e => this.handleChange(e.target.name, e.target.value)}
-            margin="normal"
-          />
-          <TextField
-            label="Payment period (days)"
-            className="field"
-            name="period"
-            type="number"
-            value={this.state.period}
-            onChange={e => this.handleChange(e.target.name, e.target.value)}
-            margin="normal"
-          />
-          <FormControl className="field">
-            <InputLabel shrink htmlFor="age-label-placeholder">
-              Token
-            </InputLabel>
-            <Select
-              value={this.state.tokenAddress}
+          <div className="container">
+            <TextField
+              label="Start date"
+              className="field"
+              type="date"
+              name="date"
+              value={this.state.date.toISOString().slice(0, 10)}
+              onChange={e => this.handleChange(e.target.name, new Date(e.target.value))}
+              margin="normal"
+            />
+            <TextField
+              label="Number of payments"
+              className="field"
+              name="count"
+              type="number"
+              value={this.state.count}
               onChange={e => this.handleChange(e.target.name, e.target.value)}
-              input={<Input name="tokenAddress" />}
-              displayEmpty
-              name="tokenAddress"
-            >
-              {this.props.tokens.map(token => (
-                <MenuItem value={token.address}>{token.name}</MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-          <TextField
-            label="Value"
-            className="field"
-            name="value"
-            value={this.state.value}
-            onChange={e => this.handleChange(e.target.name, e.target.value)}
-            margin="normal"
-          />
+              margin="normal"
+            />
+            <TextField
+              label="Payment period (days)"
+              className="field"
+              name="period"
+              type="number"
+              value={this.state.period}
+              onChange={e => this.handleChange(e.target.name, e.target.value)}
+              margin="normal"
+            />
+          </div>
+          <div className="container">
+            <TextField
+              label="Receiver address"
+              className="field"
+              name="receiver"
+              value={this.state.receiver}
+              onChange={e => this.handleChange(e.target.name, e.target.value)}
+              margin="normal"
+            />
+            <FormControl className="field">
+              <InputLabel shrink htmlFor="age-label-placeholder">
+                Token
+              </InputLabel>
+              <Select
+                value={this.state.tokenName}
+                onChange={e => this.handleChange(e.target.name, e.target.value)}
+                input={<Input name="tokenName" />}
+                displayEmpty
+                name="tokenName"
+              >
+                {this.props.tokens.map(token => (
+                  <MenuItem value={token.name}>{token.name}</MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+            <TextField
+              label="Value"
+              className="field"
+              name="value"
+              value={this.state.value}
+              onChange={e => this.handleChange(e.target.name, e.target.value)}
+              margin="normal"
+            />
+          </div>
           <Fab color="primary" aria-label="Add" onClick={this.handleAdd}>
             <AddIcon />
           </Fab>
@@ -128,36 +161,44 @@ class Transactions extends Component<PropsType, StateType> {
         <br />
         <br />
         <h4>Transactions</h4>
-        {/* <Table aria-labelledby="tableTitle" className="table">
+        <Table aria-labelledby="tableTitle" className="table">
           <TableHead>
             <TableRow>
-              <TableCell>Name</TableCell>
-              <TableCell>Contract address</TableCell>
-              <TableCell>Decimals</TableCell>
+              <TableCell>Date</TableCell>
+              <TableCell>Receiver address</TableCell>
+              <TableCell>Token</TableCell>
+              <TableCell>Value</TableCell>
+              <TableCell>Status</TableCell>
               <TableCell />
             </TableRow>
           </TableHead>
           <TableBody>
-            {this.props.transactions.map(transactions => (
+            {txs.map(transactions => (
               <TableRow>
-                <TableCell>{transactions.date}</TableCell>
+                <TableCell>{transactions.date.toISOString().slice(0, 10)}</TableCell>
                 <TableCell>{transactions.address}</TableCell>
-                <TableCell>{transactions.decimals}</TableCell>
-                <TableCell>
-                  <Fab
-                    color="secondary"
-                    size="small"
-                    aria-label="Add"
-                    className="delete-button"
-                    onClick={() => this.props.onTransactionDelete(transactions.address)}
-                  >
-                    <Icon>close_icon</Icon>
-                  </Fab>
-                </TableCell>
+                <TableCell>{transactions.tokenName}</TableCell>
+                <TableCell>{transactions.value}</TableCell>
+                <TableCell>{transactions.date > Date.now() ? 'scheduled' : 'done'}</TableCell>
+                {(transactions.date > Date.now()) &&
+                  (
+                    <TableCell>
+                      <Fab
+                        color="secondary"
+                        size="small"
+                        aria-label="Add"
+                        className="delete-button"
+                        onClick={() => this.props.onTransactionDelete(transactions.date, transactions.address)}
+                      >
+                        <Icon>close_icon</Icon>
+                      </Fab>
+                    </TableCell>
+                  )
+                }
               </TableRow>
             ))}
           </TableBody>
-        </Table> */}
+        </Table>
       </div>
     );
   }

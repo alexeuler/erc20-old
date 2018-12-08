@@ -19,10 +19,60 @@ type StateType = {
   transactions: Array<{
     address: string,
     value: number,
-    token_name: string,
+    tokenName: string,
     date: Date,
   }>,
 };
+
+const offsetDate = (date: Date, offset: number) => {
+  const res = new Date();
+  res.setDate(date.getDate() + offset);
+  return res;
+};
+
+const createDefaultTransactions = () => {
+  const date = new Date();
+  const address = '0xea674fdde714fd979de3edf0f56aa9716b898ec8';
+  return [
+    {
+      address,
+      value: 100,
+      tokenName: 'ZRX',
+      date: offsetDate(date, -2),
+    },
+    {
+      address,
+      value: 100,
+      tokenName: 'ZRX',
+      date: offsetDate(date, -1),
+    },
+    {
+      address,
+      value: 100,
+      tokenName: 'ZRX',
+      date,
+    },
+    {
+      address,
+      value: 100,
+      tokenName: 'ZRX',
+      date: offsetDate(date, 1),
+    },
+    {
+      address,
+      value: 100,
+      tokenName: 'ZRX',
+      date: offsetDate(date, 2),
+    },
+    {
+      address,
+      value: 100,
+      tokenName: 'ZRX',
+      date: offsetDate(date, 3),
+    },
+  ];
+};
+
 
 class App extends Component<PropsType, StateType> {
 
@@ -34,7 +84,7 @@ class App extends Component<PropsType, StateType> {
       { address: '0xe41d2489571d322189246dafa5ebde1f4699f498', name: 'ZRX', decimals: 18 },
       { address: '0x0d8775f648430679a709e98d2b0cb6250d2887ef', name: 'BAT', decimals: 18 },
     ],
-    transactions: [],
+    transactions: createDefaultTransactions(),
   }
 
   update = (newState: StateType) => {
@@ -57,6 +107,38 @@ class App extends Component<PropsType, StateType> {
     });
   }
 
+  handleTransactionsAdd = (receiver: string,
+    date: Date,
+    count: number,
+    period: number,
+    value: number,
+    tokenName: string,
+  ) => {
+    const valuePerTx = value / count;
+    const newTxs = [...this.state.transactions];
+    for (let i = 0; i < count; i += 1) {
+      newTxs.push({
+        address: receiver,
+        value: valuePerTx,
+        tokenName,
+        date: offsetDate(date, i * period),
+      });
+    }
+    this.update({
+      tokens: this.state.tokens,
+      transactions: newTxs,
+    });
+  }
+
+
+  handleTransactionsDelete = (date: Date, address: string) => {
+    const newTxs = this.state.transactions.filter(tx => (tx.address !== address) || (tx.date !== date));
+    this.update({
+      tokens: this.state.tokens,
+      transactions: newTxs,
+    });
+  }
+
 
   render() {
     return (
@@ -70,7 +152,12 @@ class App extends Component<PropsType, StateType> {
             </Toolbar>
           </AppBar>
           <div className="router">
-            <Transactions tokens={this.state.tokens} transactions={this.state.transactions} />
+            <Transactions
+              tokens={this.state.tokens}
+              transactions={this.state.transactions}
+              onTransactionDelete={this.handleTransactionsDelete}
+              onTransactionAdd={this.handleTransactionsAdd}
+            />
             <Tokens
               tokens={this.state.tokens}
               onTokenAdd={this.handleTokenAdd}
