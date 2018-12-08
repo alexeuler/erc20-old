@@ -1,0 +1,8 @@
+.Transactions {
+  display: flex;
+  flex-direction: column;
+  .field {
+    width: 18em;
+    margin: 0 2em 0 0;
+  }
+}

@@ -6,6 +6,7 @@ import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import Button from '@material-ui/core/Button';
 import Tokens from './Tokens';
+import Transactions from './Transactions';
 import './App.scss';
 
 type PropsType = {};
@@ -16,8 +17,11 @@ type StateType = {
     decimals: number
   }>,
   transactions: Array<{
+    address: string,
     value: number,
-  }>
+    token_name: string,
+    date: Date,
+  }>,
 };
 
 class App extends Component<PropsType, StateType> {
@@ -66,6 +70,7 @@ class App extends Component<PropsType, StateType> {
             </Toolbar>
           </AppBar>
           <div className="router">
+            <Transactions tokens={this.state.tokens} transactions={this.state.transactions} />
             <Tokens
               tokens={this.state.tokens}
               onTokenAdd={this.handleTokenAdd}
