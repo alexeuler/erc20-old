@@ -33,13 +33,26 @@ class App extends Component<PropsType, StateType> {
     transactions: [],
   }
 
+  update = (newState: StateType) => {
+    this.setState(newState);
+  }
+
   handleTokenAdd = (address: string, name: string, decimals: number) => {
     const newTokens = [...this.state.tokens, { address, name, decimals }];
-    this.setState({
+    this.update({
       tokens: newTokens,
       transactions: this.state.transactions,
     });
   }
+
+  handleTokenDelete = (address: string) => {
+    const newTokens = this.state.tokens.filter(token => token.address !== address);
+    this.update({
+      tokens: newTokens,
+      transactions: this.state.transactions,
+    });
+  }
+
 
   render() {
     return (
@@ -53,7 +66,11 @@ class App extends Component<PropsType, StateType> {
             </Toolbar>
           </AppBar>
           <div className="router">
-            <Tokens tokens={this.state.tokens} onTokenAdd={this.handleTokenAdd} />
+            <Tokens
+              tokens={this.state.tokens}
+              onTokenAdd={this.handleTokenAdd}
+              onTokenDelete={this.handleTokenDelete}
+            />
           </div>
 
         </div>

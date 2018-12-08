@@ -9,7 +9,7 @@ import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
-import TableSortLabel from '@material-ui/core/TableSortLabel';
+import Icon from '@material-ui/core/Icon';
 import './Tokens.scss';
 
 type PropsType = {
@@ -19,6 +19,7 @@ type PropsType = {
     decimals: number
   }>,
   onTokenAdd: (address: string, name: string, decimals: number) => void,
+  onTokenDelete: (address: string) => void,
 };
 type StateType = {
   newTokenAddress: string,
@@ -71,7 +72,7 @@ class Tokens extends Component<PropsType, StateType> {
             margin="normal"
           />
           <TextField
-            label="Token address"
+            label="Contract address"
             className="field"
             fullWidth
             value={this.state.newTokenAddress}
@@ -95,12 +96,13 @@ class Tokens extends Component<PropsType, StateType> {
         <br />
         <br />
         <h4>Tokens</h4>
-        <Table aria-labelledby="tableTitle">
+        <Table aria-labelledby="tableTitle" className="table">
           <TableHead>
             <TableRow>
               <TableCell>Name</TableCell>
-              <TableCell>Address</TableCell>
+              <TableCell>Contract address</TableCell>
               <TableCell>Decimals</TableCell>
+              <TableCell />
             </TableRow>
           </TableHead>
           <TableBody>
@@ -109,6 +111,17 @@ class Tokens extends Component<PropsType, StateType> {
                 <TableCell>{token.name}</TableCell>
                 <TableCell>{token.address}</TableCell>
                 <TableCell>{token.decimals}</TableCell>
+                <TableCell>
+                  <Fab
+                    color="secondary"
+                    size="small"
+                    aria-label="Add"
+                    className="delete-button"
+                    onClick={() => this.props.onTokenDelete(token.address)}
+                  >
+                    <Icon>close_icon</Icon>
+                  </Fab>
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>
